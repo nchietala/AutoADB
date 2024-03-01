@@ -1,0 +1,5 @@
+/AutoADB.spec
+/dist/
+/build/
+/.venv/
+/.idea/
