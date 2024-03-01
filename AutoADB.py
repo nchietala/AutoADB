@@ -69,7 +69,7 @@ class SetupListener:
         if short_name not in self.names:
             self.names.append(short_name)
             self.infos.append(zeroconf.get_service_info(service_type, name))
-            print(f"\r{len(self.names)}: {short_name}\n Which service? ", end="")
+            print(f"\r{len(self.names)}: {short_name}\n Which service (input row number only)? ", end="")
 
     def update_service(self, *_, **__):
         pass
@@ -129,7 +129,7 @@ def main(service_name: str, script_path: str, silent: bool):
             execute = [sys.executable, service_name]
             if script_path:
                 execute.extend(["-p", script_path])
-            Popen(execute, creationflags=subprocess.CREATE_NO_WINDOW)
+            t = Popen(execute, creationflags=subprocess.CREATE_NO_WINDOW)
             return
 
         listener = AdbListener(service_name, script_path)
@@ -144,7 +144,8 @@ def main(service_name: str, script_path: str, silent: bool):
     listener = SetupListener()
     ServiceBrowser(zeroconf, "_adb-tls-connect._tcp.local.", listener)
 
-    print("Searching for ADB services...")
+    print("Ensure android device has wireless debugging enabled and is on the same network\n"
+          "Searching for ADB services...")
     index = -1
     while index < 0 or index >= len(listener.names):
         # noinspection PyBroadException
@@ -168,8 +169,12 @@ def main(service_name: str, script_path: str, silent: bool):
         pairing_conf.close()
 
     if input("Automate connection? (Y/n) ").lower().strip()[:1] in "1yt":
+        arguments = f"{listener.names[0]} -s"
         script_path = input("Enter automated command to run on connection (default blank): ")
-        arguments = f"{listener.names[index]}{(' -p ' + script_path) if script_path else ''} -s"
+        if script_path:
+            script_path = script_path.replace('"', '^"')
+            arguments += f' -p "{script_path}"'
+
         shortcut_path = os.path.join(
             os.environ["APPDATA"], r"Microsoft\Windows\Start Menu\Programs\Startup", f"AutoADB.lnk"
         )
