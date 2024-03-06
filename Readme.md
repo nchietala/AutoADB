@@ -16,6 +16,10 @@ cases, but it was not developed with those in mind.
 - **Custom Script Execution**: Optionally runs a custom script upon successfully connecting to the device, allowing for automated task execution (In my case this is a scrcpy-noconsole window).
 - **Background Operation**: Runs silently in the background, without opening a terminal window.
 
+## Known Issues
+
+- Windows Defender (and probably other antivirus software) does not like the exe, and doesn't permit it to execute.
+
 ## Getting Started
 
 ### Prerequisites
